@@ -3,7 +3,8 @@ import React, { useState, useCallback, useRef } from 'react';
 import { Upload, Image as ImageIcon, Wand2, Download, RotateCcw, AlertCircle, CheckCircle2, Loader2, ChevronRight, Layers, Trash2 } from 'lucide-react';
 import { PRODUCTS, APP_NAME } from './constants';
 import { LogoData, GenerationState } from './types';
-import { generateMockup, editMockup } from './services/geminiService';
+import { generateMockup } from './services/generationService';
+import { editMockup } from './services/editingService';
 
 const App: React.FC = () => {
   const [logo, setLogo] = useState<LogoData | null>(null);
