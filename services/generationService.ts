@@ -1,9 +1,42 @@
 
 import { GoogleGenAI } from "@google/genai";
 
+// --- CONFIGURATION ---
+// Set this to true to use your deployed Cloud Run backend.
+// Set this to false to use the client-side Gemini SDK (Preview Mode).
+const USE_CLOUD_RUN_BACKEND = false;
+
+// Replace with your actual Cloud Run URL after deployment
+const CLOUD_RUN_URL = 'https://generation-service-xyz.a.run.app/generate'; 
+
 const MODEL_NAME = 'gemini-2.5-flash-image';
 
 export async function generateMockup(logoBase64: string, logoMimeType: string, product: string): Promise<string> {
+  
+  // 1. Production Mode: Call Cloud Run Service
+  if (USE_CLOUD_RUN_BACKEND) {
+    const response = await fetch(CLOUD_RUN_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        logoBase64,
+        logoMimeType,
+        product
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to generate mockup via backend');
+    }
+
+    const data = await response.json();
+    return data.image;
+  }
+
+  // 2. Preview Mode: Direct Client-Side Call
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
   
   const prompt = `Create a professional, high-resolution commercial product mockup for a ${product}. 
